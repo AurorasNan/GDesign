@@ -363,8 +363,7 @@ def train():
                     # writer.add_scalar('C', losses['C'], iteration)
                     # writer.add_scalar('S', losses['S'], iteration)
                     # writer.add_scalar('T', total, iteration)
-                    print("hhhh")
-                    print("hhhkkk")
+                    # print("hell")
 
                     print(('[%3d] %7d ||' + (' %s: %.3f |' * len(losses)) + ' T: %.3f || ETA: %s || timer: %.3f')
                             % tuple([epoch, iteration] + loss_labels + [total, eta_str, elapsed]), flush=True)
