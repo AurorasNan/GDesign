@@ -287,7 +287,7 @@ def train():
     # try-except so you can use ctrl+c to save early and stop training
     try:
         for epoch in range(num_epochs):
-            writer = SummaryWriter(log_dir='graph', flush_secs=60)
+            # writer = SummaryWriter(log_dir='graph', flush_secs=60)
             # Resume from start_iter
             if (epoch+1)*epoch_size < iteration:
                 continue
@@ -359,11 +359,12 @@ def train():
                     
                     total = sum([loss_avgs[k].get_avg() for k in losses])
                     loss_labels = sum([[k, loss_avgs[k].get_avg()] for k in loss_types if k in losses], [])
-                    writer.add_scalar('B', losses['B'], iteration)
-                    writer.add_scalar('C', losses['C'], iteration)
-                    writer.add_scalar('S', losses['S'], iteration)
-                    writer.add_scalar('T', total, iteration)
-
+                    # writer.add_scalar('B', losses['B'], iteration)
+                    # writer.add_scalar('C', losses['C'], iteration)
+                    # writer.add_scalar('S', losses['S'], iteration)
+                    # writer.add_scalar('T', total, iteration)
+                    print("hhhh")
+                    print("hhhkkk")
 
                     print(('[%3d] %7d ||' + (' %s: %.3f |' * len(losses)) + ' T: %.3f || ETA: %s || timer: %.3f')
                             % tuple([epoch, iteration] + loss_labels + [total, eta_str, elapsed]), flush=True)
@@ -393,11 +394,11 @@ def train():
                         if args.keep_latest_interval <= 0 or iteration % args.keep_latest_interval != args.save_interval:
                             print('Deleting old save...')
                             os.remove(latest)
-            writer.add_scalar('BB', losses['B'], epoch)
-            writer.add_scalar('CC', losses['C'], epoch)
-            writer.add_scalar('SS', losses['S'], epoch)
-            writer.add_scalar('TT', total, epoch)
-            writer.close()
+            # writer.add_scalar('BB', losses['B'], epoch)
+            # writer.add_scalar('CC', losses['C'], epoch)
+            # writer.add_scalar('SS', losses['S'], epoch)
+            # writer.add_scalar('TT', total, epoch)
+            # writer.close()
             # This is done per epoch
             if args.validation_epoch > 0:
                 if epoch % args.validation_epoch == 0 and epoch > 0:
@@ -524,20 +525,20 @@ def compute_validation_map(epoch, iteration, yolact_net, dataset, log:Log=None):
         print()
         print("Computing validation mAP (this may take a while)...", flush=True)
         val_info = eval_script.evaluate(yolact_net, dataset, train_mode=True)
-        writer = SummaryWriter(log_dir='graph', flush_secs=60)
-        writer.add_scalar('box_all', val_info['box']['all'], epoch)
-        writer.add_scalar('box_55', val_info['box'][55], epoch)
-        writer.add_scalar('box_65', val_info['box'][65], epoch)
-        writer.add_scalar('box_75', val_info['box'][75], epoch)
-        writer.add_scalar('box_85', val_info['box'][85], epoch)
-        writer.add_scalar('box_95', val_info['box'][95], epoch)
-        writer.add_scalar('mask_all', val_info['mask']['all'], epoch)
-        writer.add_scalar('mask_55', val_info['mask'][55], epoch)
-        writer.add_scalar('mask_65', val_info['mask'][65], epoch)
-        writer.add_scalar('mask_75', val_info['mask'][75], epoch)
-        writer.add_scalar('mask_85', val_info['mask'][85], epoch)
-        writer.add_scalar('mask_95', val_info['mask'][95], epoch)
-        writer.close()
+        # writer = SummaryWriter(log_dir='graph', flush_secs=60)
+        # writer.add_scalar('box_all', val_info['box']['all'], epoch)
+        # writer.add_scalar('box_55', val_info['box'][55], epoch)
+        # writer.add_scalar('box_65', val_info['box'][65], epoch)
+        # writer.add_scalar('box_75', val_info['box'][75], epoch)
+        # writer.add_scalar('box_85', val_info['box'][85], epoch)
+        # writer.add_scalar('box_95', val_info['box'][95], epoch)
+        # writer.add_scalar('mask_all', val_info['mask']['all'], epoch)
+        # writer.add_scalar('mask_55', val_info['mask'][55], epoch)
+        # writer.add_scalar('mask_65', val_info['mask'][65], epoch)
+        # writer.add_scalar('mask_75', val_info['mask'][75], epoch)
+        # writer.add_scalar('mask_85', val_info['mask'][85], epoch)
+        # writer.add_scalar('mask_95', val_info['mask'][95], epoch)
+        # writer.close()
         end = time.time()
 
         if log is not None:
