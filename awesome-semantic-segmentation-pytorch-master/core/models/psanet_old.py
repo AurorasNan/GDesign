@@ -156,7 +156,7 @@ class _DistributeModule(nn.Module):
 
 
 def get_psanet(dataset='pascal_voc', backbone='resnet50', pretrained=False, root='~/.torch/models',
-               pretrained_base=True, **kwargs):
+               pretrained_base=False, **kwargs):
     acronyms = {
         'pascal_voc': 'pascal_voc',
         'pascal_aug': 'pascal_aug',
@@ -168,7 +168,7 @@ def get_psanet(dataset='pascal_voc', backbone='resnet50', pretrained=False, root
     model = PSANet(datasets[dataset].NUM_CLASS, backbone=backbone, pretrained_base=pretrained_base, **kwargs)
     if pretrained:
         from .model_store import get_model_file
-        device = torch.device(kwargs['local_rank'])
+        device = torch.device(0)
         model.load_state_dict(torch.load(get_model_file('deeplabv3_%s_%s' % (backbone, acronyms[dataset]), root=root),
                               map_location=device))
     return model

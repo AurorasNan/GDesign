@@ -137,7 +137,7 @@ class _ASPP(nn.Module):
 
 
 def get_deeplabv3(dataset='pascal_voc', backbone='resnet50', pretrained=False, root='~/.torch/models',
-                  pretrained_base=True, **kwargs):
+                  pretrained_base=False, **kwargs):
     acronyms = {
         'pascal_voc': 'pascal_voc',
         'pascal_aug': 'pascal_aug',
