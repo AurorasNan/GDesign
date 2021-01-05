@@ -78,14 +78,14 @@ def main():
         data["categories"].append(
             dict(supercategory=None, id=class_id, name=class_name,)
         )
-
+        #data["categories"]记录的是检测的类别和id
     out_ann_file = osp.join(args.output_dir, "annotations.json")
-    label_files = glob.glob(osp.join(args.input_dir, "*.json"))
+    label_files = glob.glob(osp.join(args.input_dir, "*.json"))#获取所有json文件
     for image_id, filename in enumerate(label_files):
         print("Generating dataset from:", filename)
 
         label_file = labelme.LabelFile(filename=filename)
-
+        #osp.basename()返回/后的文件名，比如："in/001.json"，该函数结果为001.json  osp.splitext()分割文件名
         base = osp.splitext(osp.basename(filename))[0]
         out_img_file = osp.join(args.output_dir, "JPEGImages", base + ".jpg")
 
