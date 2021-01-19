@@ -43,9 +43,13 @@ class DeepLabV3(SegBaseModel):
     def forward(self, x):
         size = x.size()[2:]
         _, _, c3, c4 = self.base_forward(x)
-        outputs = []
+        print("c3:",c3.shape)
+        print("c4:",c4.size())
+        outputs =[]
         x = self.head(c4)
+        print("x:",x.size())
         x = F.interpolate(x, size, mode='bilinear', align_corners=True)
+        print("x2:",x.size())
         outputs.append(x)
 
         if self.aux:
@@ -127,10 +131,15 @@ class _ASPP(nn.Module):
 
     def forward(self, x):
         feat1 = self.b0(x)
+        print("feat1：", feat1.size())
         feat2 = self.b1(x)
+        print("feat2：", feat2.size())
         feat3 = self.b2(x)
+        print("feat3：", feat3.size())
         feat4 = self.b3(x)
+        print("feat4：", feat4.size())
         feat5 = self.b4(x)
+        print("feat5：", feat5.size())
         x = torch.cat((feat1, feat2, feat3, feat4, feat5), dim=1)
         x = self.project(x)
         return x
@@ -149,7 +158,7 @@ def get_deeplabv3(dataset='pascal_voc', backbone='resnet50', pretrained=False, r
     model = DeepLabV3(datasets[dataset].NUM_CLASS, backbone=backbone, pretrained_base=pretrained_base, **kwargs)
     if pretrained:
         from .model_store import get_model_file
-        device = torch.device(kwargs['local_rank'])
+        device = torch.device(0)
         model.load_state_dict(torch.load(get_model_file('deeplabv3_%s_%s' % (backbone, acronyms[dataset]), root=root),
                               map_location=device))
     return model

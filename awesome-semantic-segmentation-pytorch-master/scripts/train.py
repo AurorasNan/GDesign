@@ -33,7 +33,8 @@ def parse_args():
                                  'danet', 'denseaspp', 'bisenet',
                                  'encnet', 'dunet', 'icnet',
                                  'enet', 'ocnet', 'ccnet', 'psanet',
-                                 'cgnet', 'espnet', 'lednet', 'dfanet'],
+                                 'cgnet', 'espnet', 'lednet', 'dfanet', 'bisenetv2',
+                                 'augbisenet', 'augbisenetv2','unet', 'bisenetDensenet', 'bisenet152'],
                         help='model name (default: fcn32s)')
     parser.add_argument('--backbone', type=str, default='resnet50',
                         choices=['vgg16', 'resnet18', 'resnet50',
@@ -59,7 +60,7 @@ def parse_args():
                         help='Auxiliary loss')
     parser.add_argument('--aux-weight', type=float, default=0.4,
                         help='auxiliary loss weight')
-    parser.add_argument('--batch-size', type=int, default=2, metavar='N',
+    parser.add_argument('--batch-size', type=int, default=1, metavar='N',
                         help='input batch size for training (default: 8)')
     parser.add_argument('--start_epoch', type=int, default=0,
                         metavar='N', help='start epochs (default:0)')
@@ -134,7 +135,7 @@ class Trainer(object):
         input_transform = transforms.Compose([
             transforms.ToTensor(),
             transforms.Normalize([.485, .456, .406], [.229, .224, .225]),
-        ])
+        ])#将0-255归一化到[0,1],再Normalize后归一化到[-1,-1](改变分布-正态分布），mean为均值，std为各通道标准差
         # dataset and dataloader
         data_kwargs = {'transform': input_transform, 'base_size': args.base_size, 'crop_size': args.crop_size}
         train_dataset = get_segmentation_dataset(args.dataset, split='train', mode='train', **data_kwargs)
@@ -213,7 +214,7 @@ class Trainer(object):
         self.model.train()
         for iteration, (images, targets, _) in enumerate(self.train_loader):
             iteration = iteration + 1
-            self.lr_scheduler.step()
+            # self.lr_scheduler.step()
 
             images = images.to(self.device)
             targets = targets.to(self.device)
@@ -246,7 +247,7 @@ class Trainer(object):
             if not self.args.skip_val and iteration % val_per_iters == 0:
                 self.validation()
                 self.model.train()
-
+            self.lr_scheduler.step()
         save_checkpoint(self.model, self.args, is_best=False)
         total_training_time = time.time() - start_time
         total_training_str = str(datetime.timedelta(seconds=total_training_time))

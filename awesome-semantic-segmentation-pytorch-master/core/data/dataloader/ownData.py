@@ -58,7 +58,8 @@ class OWNSegmentation(SegmentationDataset):
         with open(os.path.join(_split_f), "r") as lines:
             for line in lines:
                 _image = os.path.join(_image_dir, line.rstrip('\n') + ".jpg")
-                assert os.path.isfile(_image)
+                # assert os.path.isfile(_image)
+                if os.path.isfile(_image) == False: continue
                 self.images.append(_image)
                 if split != 'test':
                     _mask = os.path.join(_mask_dir, line.rstrip('\n') + ".png")

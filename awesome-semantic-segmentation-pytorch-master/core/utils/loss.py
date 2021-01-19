@@ -6,7 +6,8 @@ import torch.nn.functional as F
 from torch.autograd import Variable
 
 __all__ = ['MixSoftmaxCrossEntropyLoss', 'MixSoftmaxCrossEntropyOHEMLoss',
-           'EncNetLoss', 'ICNetLoss', 'get_segmentation_loss']
+           'EncNetLoss', 'ICNetLoss', 'get_segmentation_loss','BisenetLoss']
+
 
 
 # TODO: optim function
@@ -32,6 +33,20 @@ class MixSoftmaxCrossEntropyLoss(nn.CrossEntropyLoss):
             return dict(loss=self._aux_forward(*inputs))
         else:
             return dict(loss=super(MixSoftmaxCrossEntropyLoss, self).forward(*inputs))
+
+class BisenetLoss(nn.CrossEntropyLoss):
+    def __init__(self, aux=True, aux_weight=0.2, ignore_index=-1, **kwargs):
+        super(BisenetLoss, self).__init__(ignore_index=ignore_index)
+        self.aux = aux
+        self.aux_weight = aux_weight
+        self.mseLoss = nn.MSELoss()
+
+    def forward(self, *inputs, **kwargs):
+        preds, target = tuple(inputs)
+        inputs = tuple(list(preds) + [target])
+        pre, tar = inputs
+        loss2 = self.mseLoss(torch.sigmoid(pre), tar)
+        return dict(loss=loss2)
 
 
 # reference: https://github.com/zhanghang1989/PyTorch-Encoding/blob/master/encoding/nn/loss.py

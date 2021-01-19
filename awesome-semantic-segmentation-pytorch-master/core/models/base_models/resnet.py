@@ -213,7 +213,12 @@ def resnet152(pretrained=False, **kwargs):
     Args:
         pretrained (bool): If True, returns a model pre-trained on ImageNet
     """
-    model = ResNet(Bottleneck, [3, 8, 36, 3], **kwargs)
+    # orgin
+    # model = ResNet(Bottleneck, [3, 8, 36, 3], **kwargs)
+    # version 01
+    # model = ResNet(Bottleneck, [3, 4, 18, 3], **kwargs)
+    # version 02
+    model = ResNet(Bottleneck, [3, 4, 9, 3], **kwargs)
     if pretrained:
         model.load_state_dict(model_zoo.load_url(model_urls['resnet152']))
     return model

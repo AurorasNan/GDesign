@@ -4,18 +4,15 @@ import torch.nn as nn
 import torch.nn.functional as F
 
 
-from core.models.base_models.resnetv1b import resnet101_v1s, resnet50_v1s
-from core.models.base_models.resnet import resnet18
-from core.models.base_models.densenet import densenet121
+from core.models.base_models.resnet import resnet152
 from core.nn import _ConvBNReLU
 
-__all__ = ['BiSeNet', 'get_bisenet', 'get_bisenet_resnet18_citys',
-           'get_bisenet_resnet101_citys', 'get_bisenet_resnet50_citys',]
+__all__ = ['BiSeNet152', 'get_bisenet152', 'get_bisenet152_resnet152_voc']
 
 
-class BiSeNet(nn.Module):
-    def __init__(self, nclass, backbone='resnet18', aux=True, jpu=False, pretrained_base=True, **kwargs):
-        super(BiSeNet, self).__init__()
+class BiSeNet152(nn.Module):
+    def __init__(self, nclass, backbone='resnet152', aux=True, jpu=False, pretrained_base=True, **kwargs):
+        super(BiSeNet152, self).__init__()
         self.aux = aux
         self.spatial_path = SpatialPath(3, 128, nclass, **kwargs)
         self.context_path = ContextPath(backbone, pretrained_base, **kwargs)
@@ -225,16 +222,10 @@ class AttentionRefinmentModule(nn.Module):
 
 
 class ContextPath(nn.Module):
-    def __init__(self, backbone='resnet18', pretrained_base=True, norm_layer=nn.BatchNorm2d, **kwargs):
+    def __init__(self, backbone='resnet152', pretrained_base=True, norm_layer=nn.BatchNorm2d, **kwargs):
         super(ContextPath, self).__init__()
-        if backbone == 'resnet18':
-            pretrained = resnet18(pretrained=pretrained_base, **kwargs)
-        elif backbone == 'resnet50':
-            pretrained = resnet50_v1s(pretrained=pretrained_base, **kwargs)
-        elif backbone == 'resnet101':
-            pretrained = resnet101_v1s(pretrained=pretrained_base, **kwargs)
-        elif backbone == 'densenet121':
-            pretrained = densenet121(pretrained_base=pretrained_base, **kwargs)
+        if backbone == 'resnet152':
+            pretrained = resnet152(pretrained=pretrained_base, **kwargs)
         else:
             raise RuntimeError('unknown backbone: {}'.format(backbone))
         self.conv1 = pretrained.conv1
@@ -247,18 +238,12 @@ class ContextPath(nn.Module):
         self.layer4 = pretrained.layer4
 
         inter_channels = 128
-        if backbone == 'resnet18':
-            self.global_context = _GlobalAvgPooling(512, inter_channels, norm_layer)
-            self.arms = nn.ModuleList(
-                [AttentionRefinmentModule(512, inter_channels, norm_layer, **kwargs),
-                AttentionRefinmentModule(256, inter_channels, norm_layer, **kwargs)]
-            )
-        if backbone == 'resnet101':
-            self.global_context = _GlobalAvgPooling(2048, inter_channels, norm_layer)
-            self.arms = nn.ModuleList(
-                [AttentionRefinmentModule(2048, inter_channels, norm_layer, **kwargs),
-                 AttentionRefinmentModule(1024, inter_channels, norm_layer, **kwargs)]
-            )
+        self.global_context = _GlobalAvgPooling(2048, inter_channels, norm_layer)
+        self.arms = nn.ModuleList(
+            [AttentionRefinmentModule(2048, inter_channels, norm_layer, **kwargs),
+             AttentionRefinmentModule(1024, inter_channels, norm_layer, **kwargs)]
+        )
+
         self.refines = nn.ModuleList(
             [_ConvBNReLU(inter_channels, inter_channels, 3, 1, 1, norm_layer=norm_layer),
              _ConvBNReLU(inter_channels, inter_channels, 3, 1, 1, norm_layer=norm_layer)]
@@ -314,7 +299,7 @@ class FeatureFusion(nn.Module):
         return out
 
 
-def get_bisenet(dataset='pascal_voc', backbone='resnet18', pretrained=False, root='~/.torch/models',
+def get_bisenet152(dataset='pascal_voc', backbone='resnet152', pretrained=False, root='~/.torch/models',
                 pretrained_base=False, **kwargs):
     acronyms = {
         'pascal_voc': 'pascal_voc',
@@ -324,24 +309,18 @@ def get_bisenet(dataset='pascal_voc', backbone='resnet18', pretrained=False, roo
         'citys': 'citys',
     }
     from ..data.dataloader import datasets
-    model = BiSeNet(datasets[dataset].NUM_CLASS, backbone=backbone, pretrained_base=pretrained_base, **kwargs)
+    model = BiSeNet152(datasets[dataset].NUM_CLASS, backbone=backbone, pretrained_base=pretrained_base, **kwargs)
     if pretrained:
         from .model_store import get_model_file
         device = torch.device(0)
-        model.load_state_dict(torch.load(get_model_file('bisenet_%s_%s' % (backbone, acronyms[dataset]), root=root),
+        model.load_state_dict(torch.load(get_model_file('bisenet152_%s_%s' % (backbone, acronyms[dataset]), root=root),
                               map_location=device), False)
     return model
 
 
-def get_bisenet_resnet18_citys(**kwargs):
-    return get_bisenet('pascal_voc', 'resnet18', **kwargs)
 
-def get_bisenet_resnet101_citys(**kwargs):
-    return get_bisenet('pascal_voc', 'resnet101', **kwargs)
-
-def get_bisenet_resnet50_citys(**kwargs):
-    return get_bisenet('pascal_voc', 'resnet50', **kwargs)
-
+def get_bisenet152_resnet152_voc(**kwargs):
+    return get_bisenet152('pascal_voc', 'resnet152', **kwargs)
 
 
 

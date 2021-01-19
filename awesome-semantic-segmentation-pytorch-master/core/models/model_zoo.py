@@ -7,6 +7,9 @@ from .deeplabv3_plus import *
 from .danet import *
 from .denseaspp import *
 from .bisenet import *
+from .bisenetv2 import *
+from .augbisenetv2 import *
+from .augBisenet import *
 from .encnet import *
 from .dunet import *
 from .icnet import *
@@ -18,6 +21,9 @@ from .cgnet import *
 from .espnet import *
 from .lednet import *
 from .dfanet import *
+from .unet import *
+from .bisenetDensenet import *
+from .bisenet152 import *
 
 __all__ = ['get_model', 'get_model_list', 'get_segmentation_model']
 
@@ -41,24 +47,32 @@ _models = {
     'deeplabv3_resnet101_ade': get_deeplabv3_resnet101_ade,
     'deeplabv3_resnet152_ade': get_deeplabv3_resnet152_ade,
     'deeplabv3_plus_xception_voc': get_deeplabv3_plus_xception_voc,
-    'danet_resnet50_ciyts': get_danet_resnet50_citys,
+    'danet_resnet50_voc': get_danet_resnet50_citys,
     'danet_resnet101_citys': get_danet_resnet101_citys,
     'danet_resnet152_citys': get_danet_resnet152_citys,
-    'denseaspp_densenet121_citys': get_denseaspp_densenet121_citys,
+    'denseaspp_densenet121_voc': get_denseaspp_densenet121_citys,
     'denseaspp_densenet161_citys': get_denseaspp_densenet161_citys,
     'denseaspp_densenet169_citys': get_denseaspp_densenet169_citys,
     'denseaspp_densenet201_citys': get_denseaspp_densenet201_citys,
-    'bisenet_resnet18_citys': get_bisenet_resnet18_citys,
+    'bisenet_resnet18_voc': get_bisenet_resnet18_citys,
+    'bisenet_resnet101_voc': get_bisenet_resnet101_citys,
+    'bisenet_resnet50_voc': get_bisenet_resnet50_citys,
+    'bisenet_densenet121_voc': get_bisenet_densenet121_citys,
+    'augbisenet_resnet18_voc': get_augbisenet_resnet18_citys,
+    'augbisenet_resnet101_voc': get_augbisenet_resnet101_citys,
+    'augbisenet_resnet50_voc': get_augbisenet_resnet50_citys,
+    'bisenetv2_resnet18_voc': get_bisenetv2_resnet18_pascal_voc,
+    'augbisenetv2_resnet18_voc': get_augbisenetv2_resnet18_pascal_voc,
     'encnet_resnet50_ade': get_encnet_resnet50_ade,
     'encnet_resnet101_ade': get_encnet_resnet101_ade,
     'encnet_resnet152_ade': get_encnet_resnet152_ade,
-    'dunet_resnet50_pascal_voc': get_dunet_resnet50_pascal_voc,
+    'dunet_resnet50_voc': get_dunet_resnet50_pascal_voc,
     'dunet_resnet101_pascal_voc': get_dunet_resnet101_pascal_voc,
     'dunet_resnet152_pascal_voc': get_dunet_resnet152_pascal_voc,
     'icnet_resnet50_citys': get_icnet_resnet50_citys,
     'icnet_resnet101_citys': get_icnet_resnet101_citys,
     'icnet_resnet152_citys': get_icnet_resnet152_citys,
-    'enet_citys': get_enet_citys,
+    'enet_vgg16_voc': get_enet_citys,
     'base_ocnet_resnet101_citys': get_base_ocnet_resnet101_citys,
     'pyramid_ocnet_resnet101_citys': get_pyramid_ocnet_resnet101_citys,
     'asp_ocnet_resnet101_citys': get_asp_ocnet_resnet101_citys,
@@ -74,10 +88,12 @@ _models = {
     'psanet_resnet50_citys': get_psanet_resnet50_citys,
     'psanet_resnet101_citys': get_psanet_resnet101_citys,
     'psanet_resnet152_citys': get_psanet_resnet152_citys,
-    'cgnet_citys': get_cgnet_citys,
-    'espnet_citys': get_espnet_citys,
-    'lednet_citys': get_lednet_citys,
+    'cgnet_vgg16_voc': get_cgnet_citys,
+    'espnet_vgg16_voc': get_espnet_citys,
+    'lednet_vgg16_voc': get_lednet_citys,
     'dfanet_citys': get_dfanet_citys,
+    'unet_voc': get_unet_voc,
+    'bisenet152_resnet152_voc': get_bisenet152_resnet152_voc
 }
 
 
@@ -106,7 +122,10 @@ def get_segmentation_model(model, **kwargs):
         'deeplabv3_plus': get_deeplabv3_plus,
         'danet': get_danet,
         'denseaspp': get_denseaspp,
+        'augbisenet':get_augbisenet,
         'bisenet': get_bisenet,
+        'bisenetv2':get_bisenetv2,
+        'augbisenetv2':get_augbisenetv2,
         'encnet': get_encnet,
         'dunet': get_dunet,
         'icnet': get_icnet,
@@ -118,5 +137,8 @@ def get_segmentation_model(model, **kwargs):
         'espnet': get_espnet,
         'lednet': get_lednet,
         'dfanet': get_dfanet,
+        'unet': get_unet,
+        'bisenetDensenet': get_bisenet,
+        'bisenet152': get_bisenet152
     }
     return models[model](**kwargs)

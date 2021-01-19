@@ -2,6 +2,7 @@ from __future__ import print_function
 
 import os
 import sys
+import time
 
 cur_path = os.path.abspath(os.path.dirname(__file__))
 root_path = os.path.split(cur_path)[0]
@@ -35,7 +36,8 @@ class Evaluator(object):
         ])
 
         # dataset and dataloader
-        val_dataset = get_segmentation_dataset(args.dataset, split='val', mode='testval', transform=input_transform)
+        data_kwargs = {'transform': input_transform, 'base_size': args.base_size, 'crop_size': args.crop_size}
+        val_dataset = get_segmentation_dataset(args.dataset, split='val', mode='testval', **data_kwargs)
         val_sampler = make_data_sampler(val_dataset, False, args.distributed)
         val_batch_sampler = make_batch_data_sampler(val_sampler, images_per_batch=1)
         self.val_loader = data.DataLoader(dataset=val_dataset,
@@ -47,7 +49,6 @@ class Evaluator(object):
         BatchNorm2d = nn.SyncBatchNorm if args.distributed else nn.BatchNorm2d
         self.model = get_segmentation_model(model=args.model, dataset=args.dataset, backbone=args.backbone,
                                             aux=args.aux, pretrained=True, pretrained_base=False,
-                                            local_rank=args.local_rank,
                                             norm_layer=BatchNorm2d).to(self.device)
         if args.distributed:
             self.model = nn.parallel.DistributedDataParallel(self.model,
@@ -64,7 +65,9 @@ class Evaluator(object):
         else:
             model = self.model
         logger.info("Start validation, Total sample: {:d}".format(len(self.val_loader)))
+        fps_sum = 0.0
         for i, (image, target, filename) in enumerate(self.val_loader):
+            start = time.time()
             image = image.to(self.device)
             target = target.to(self.device)
 
@@ -72,8 +75,11 @@ class Evaluator(object):
                 outputs = model(image)
             self.metric.update(outputs[0], target)
             pixAcc, mIoU = self.metric.get()
-            logger.info("Sample: {:d}, validation pixAcc: {:.3f}, mIoU: {:.3f}".format(
-                i + 1, pixAcc * 100, mIoU * 100))
+            end = time.time()
+            fps = 1.0 / (end - start)
+            fps_sum = fps_sum + fps
+            logger.info("Sample: {:d}, validation pixAcc: {:.3f}, mIoU: {:.3f}, FPS: {:.3f}".format(
+                i + 1, pixAcc * 100, mIoU * 100, fps))
 
             if self.args.save_pred:
                 pred = torch.argmax(outputs[0], 1)
@@ -82,6 +88,10 @@ class Evaluator(object):
                 predict = pred.squeeze(0)
                 mask = get_color_pallete(predict, self.args.dataset)
                 mask.save(os.path.join(outdir, os.path.splitext(filename[0])[0] + '.png'))
+                #danet  显存不足
+                #if i + 1 > 302: break
+        avg_fps = fps_sum / len(self.val_loader)
+        logger.info("avgFPS: {:.3f}".format(avg_fps))
         synchronize()
 
 

@@ -193,20 +193,21 @@ def get_danet(dataset='citys', backbone='resnet50', pretrained=False,
         from .model_store import get_model_file
         device = torch.device(0)
         model.load_state_dict(torch.load(get_model_file('danet_%s_%s' % (backbone, acronyms[dataset]), root=root),
-                              map_location=device))
+                              map_location=device), False)
+        #False是danet加的
     return model
 
 
 def get_danet_resnet50_citys(**kwargs):
-    return get_danet('citys', 'resnet50', **kwargs)
+    return get_danet('pascal_voc', 'resnet50', **kwargs)
 
 
 def get_danet_resnet101_citys(**kwargs):
-    return get_danet('citys', 'resnet101', **kwargs)
+    return get_danet('pascal_voc', 'resnet101', **kwargs)
 
 
 def get_danet_resnet152_citys(**kwargs):
-    return get_danet('citys', 'resnet152', **kwargs)
+    return get_danet('pascal_voc', 'resnet152', **kwargs)
 
 
 if __name__ == '__main__':

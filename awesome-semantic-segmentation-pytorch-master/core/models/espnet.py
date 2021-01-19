@@ -90,7 +90,7 @@ class _PSPModule(nn.Module):
         return self.project(torch.cat(feats, dim=1))
 
 
-def get_espnet(dataset='pascal_voc', backbone='', pretrained=False, root='~/.torch/models',
+def get_espnet(dataset='pascal_voc', backbone='vgg16', pretrained=False, root='~/.torch/models',
                pretrained_base=False, **kwargs):
     acronyms = {
         'pascal_voc': 'pascal_voc',
@@ -110,7 +110,7 @@ def get_espnet(dataset='pascal_voc', backbone='', pretrained=False, root='~/.tor
 
 
 def get_espnet_citys(**kwargs):
-    return get_espnet('citys', **kwargs)
+    return get_espnet('pascal_voc', **kwargs)
 
 
 if __name__ == '__main__':

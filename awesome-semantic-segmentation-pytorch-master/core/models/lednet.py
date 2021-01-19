@@ -167,7 +167,7 @@ class APNModule(nn.Module):
         return out
 
 
-def get_lednet(dataset='citys', backbone='', pretrained=False, root='~/.torch/models',
+def get_lednet(dataset='citys', backbone='vgg16', pretrained=False, root='~/.torch/models',
                pretrained_base=True, **kwargs):
     acronyms = {
         'pascal_voc': 'pascal_voc',
@@ -181,13 +181,13 @@ def get_lednet(dataset='citys', backbone='', pretrained=False, root='~/.torch/mo
     if pretrained:
         from .model_store import get_model_file
         device = torch.device(0)
-        model.load_state_dict(torch.load(get_model_file('lednet_%s' % (acronyms[dataset]), root=root),
+        model.load_state_dict(torch.load(get_model_file('lednet_%s_%s' % (backbone, acronyms[dataset]), root=root),
                               map_location=device))
     return model
 
 
 def get_lednet_citys(**kwargs):
-    return get_lednet('citys', **kwargs)
+    return get_lednet('pascal_voc', **kwargs)
 
 
 if __name__ == '__main__':

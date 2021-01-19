@@ -228,13 +228,13 @@ def get_enet(dataset='citys', backbone='', pretrained=False, root='~/.torch/mode
     if pretrained:
         from .model_store import get_model_file
         device = torch.device(0)
-        model.load_state_dict(torch.load(get_model_file('enet_%s' % (acronyms[dataset]), root=root),
+        model.load_state_dict(torch.load(get_model_file('enet_%s_%s' % (backbone, acronyms[dataset]), root=root),
                               map_location=device))
     return model
 
 
 def get_enet_citys(**kwargs):
-    return get_enet('citys', '', **kwargs)
+    return get_enet('pascal_voc', 'vgg16', **kwargs)
 
 
 if __name__ == '__main__':

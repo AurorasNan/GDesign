@@ -157,7 +157,7 @@ def get_denseaspp(dataset='citys', backbone='densenet121', pretrained=False,
 
 
 def get_denseaspp_densenet121_citys(**kwargs):
-    return get_denseaspp('citys', 'densenet121', **kwargs)
+    return get_denseaspp('pascal_voc', 'densenet121', **kwargs)
 
 
 def get_denseaspp_densenet161_citys(**kwargs):
